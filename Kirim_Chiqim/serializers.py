@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Account
+from .models import Account, Transaction
 from .models import VIA_EMAIL, VIA_PHONE, DONE
 from base.utils import input_regix
 from rest_framework.exceptions import ValidationError
@@ -113,5 +113,28 @@ class UPdateUserPropertiesSerializer(serializers.ModelSerializer):
         return {
             'data': data,
             'msg': 'Account muvaffaqiyatli yaratildi'
+        }
+    
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = ['your_money', 'transaction_name']
+
+    def validate(self, attrs):
+        return super().validate(attrs)
+    
+    def save(self, **kwargs):
+        return super().save(**kwargs)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context['request']
+        user = request.user
+        balance = user.balance
+
+        return {
+            'data': data,
+            'balance': balance
         }
     
